@@ -57,27 +57,56 @@ public class OcrController {
             // STRICT CATEGORY-CONTROLLED PROMPT
             parts.addObject().put("text",
                     """
-                    You are an OCR receipt parser. Extract all purchasable items from the receipt.
-
+                    You are an OCR receipt parser with multilingual support.
+            
+                    TASK:
+                    1. Detect the language of the receipt automatically.
+                    2. Translate ALL extracted item names, notes, store names, and descriptions to ENGLISH.
+                    3. Extract ONLY purchasable items from the receipt.
+                    4. ALWAYS output final JSON IN ENGLISH ONLY.
+            
+                            CATEGORY RULES (IMPORTANT):
+                                Classify items strictly into one of:
+                                ["FOOD","TRAVEL","EDUCATION","BILLS","SALARY"]
+                            
+                                Use the following classification logic:
+                                - FOOD → edible items, snacks, groceries, drinks, meals.
+                                - TRAVEL → fuel, tolls, parking, bus/train/auto fares.
+                                - EDUCATION → notebooks, pens, books, stationery, school/college materials.
+                                - BILLS → medicines, pharmacy items, cosmetics, household goods, tools,
+                                           fertilizers, farming items, electronics, repairs, services, misc shopping.
+                                - SALARY → income entries only.
+                            
+                                If an item does NOT belong to FOOD, TRAVEL, EDUCATION, or SALARY → classify as BILLS.
+                                Never classify fertilizers or household items as FOOD.
+                                Never default to FOOD unless the item is clearly edible.
+                                
                     CRITICAL RULES:
-                    1. Return ONLY pure JSON. No markdown or backticks.
-                    2. Every transaction MUST use one of these EXACT categories: ["FOOD","TRAVEL","EDUCATION","BILLS","SALARY"]
-                    3. NEVER output a category outside that list.
-                    4. If unsure, default to "FOOD".
-                    5. Follow this EXACT object format for each item:
+                    1. Return ONLY pure JSON. No markdown, no backticks, no explanation.
+                    2. Every transaction MUST use one of these EXACT categories:
+                       ["FOOD","TRAVEL","EDUCATION","BILLS","SALARY"]
+                    3. If the category is unclear, default to "FOOD".
+                    4. Output must follow EXACTLY this structure:
+                    
                     {
-                      "amount": 0,
-                      "type": "EXPENSE",
-                      "category": "FOOD",
-                      "note": "",
-                      "timestamp": "",
-                      "userId": "%s"
+                      "transactions": [
+                        {
+                          "amount": 0,
+                          "type": "EXPENSE",
+                          "category": "FOOD",
+                          "note": "",
+                          "timestamp": "",
+                          "userId": "%s"
+                        }
+                      ]
                     }
-
-                    Return ONLY:
-                    { "transactions": [ ... ] }
+            
+                    Ensure all extracted text and notes are translated into ENGLISH before returning JSON.
                     """.formatted(userId)
             );
+
+
+
 
             // Gemini URL
             String url = "https://generativelanguage.googleapis.com/v1beta/models/"
