@@ -1,5 +1,6 @@
 package com.rep.finance.service;
 
+import com.rep.finance.exception.InsufficientFundsException;
 import com.rep.finance.model.*;
 import com.rep.finance.repository.TransactionRepository;
 import com.rep.finance.repository.UserRepository;
@@ -27,6 +28,23 @@ public class TransactionService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Fetch budget
+        BudgetEntity budget = budgetRepository.findByUser(user)
+                .orElse(null);
+
+        // HARD STOP: Block expense if insufficient balance
+        if (type.equalsIgnoreCase("EXPENSE")) {
+            double remaining = (budget != null) ? budget.getRemainingBudget() : 0.0;
+
+            if (remaining < amount) {
+                // THROW CUSTOM EXCEPTION, which the Global Handler will catch
+                throw new InsufficientFundsException(
+                        "Insufficient funds. You only have ₹" + remaining + " remaining."
+                );
+            }
+        }
+
+        // ... rest of the transaction saving logic ...
         TransactionEntity tx = TransactionEntity.builder()
                 .user(user)
                 .amount(amount)
@@ -36,11 +54,10 @@ public class TransactionService {
                 .build();
 
         transactionRepository.save(tx);
-
         updateBudget(user, amount, type);
-
         return tx;
     }
+
 
     public void deleteTransaction(String userId, Long transactionId) {
         TransactionEntity tx = transactionRepository.findById(transactionId)

@@ -44,7 +44,24 @@ const AddTransactionModal = ({ isOpen, onClose, onSave, transactionToEdit }) => 
             setFormData(initialState);
             onClose();
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to save transaction.');
+            // --- ENHANCED ERROR CAPTURE ---
+            const responseData = err.response?.data;
+            
+            let customError = 'Failed to save transaction.';
+            
+            if (typeof responseData === 'string' && responseData.includes('funds')) {
+                // CAPTURES: The specific plain text error from the Spring RuntimeException.
+                customError = responseData; 
+            } else if (responseData?.message) {
+                // CAPTURES: Standard JSON error format { message: "..." }
+                customError = responseData.message;
+            } else {
+                // Fallback for general network or unexpected errors
+                customError = 'Failed to save transaction. Please check your connection or server logs.';
+            }
+
+            setError(customError);
+            // -----------------------------
         } finally {
             setLoading(false);
         }

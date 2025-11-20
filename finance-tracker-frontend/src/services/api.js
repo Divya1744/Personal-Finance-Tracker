@@ -9,10 +9,11 @@ const api = axios.create({
     },
 });
 
-// Request interceptor to attach JWT token
+// REQUEST INTERCEPTOR: ATTACHES TOKEN TO EVERY PROTECTED REQUEST
 api.interceptors.request.use(
     (config) => {
-        const authData = JSON.parse(localStorage.getItem('authData'));
+        // Reads the token from localStorage on every new request
+        const authData = JSON.parse(localStorage.getItem('authData')); 
         if (authData && authData.accessToken) {
             config.headers.Authorization = `Bearer ${authData.accessToken}`;
         }
@@ -23,20 +24,20 @@ api.interceptors.request.use(
     }
 );
 
-// Response interceptor for token refresh (minimal implementation)
+// RESPONSE INTERCEPTOR: HANDLES TOKEN REFRESH ON 401
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
         const authData = JSON.parse(localStorage.getItem('authData'));
 
-        // Check for 401 and not an auth endpoint
-        if (error.response.status === 401 && !originalRequest._retry) {
+        // Check for 401 and make sure it's not a retry (to prevent infinite loops)
+        if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
             if (authData && authData.refreshToken) {
                 try {
-                    // Call the refresh endpoint
+                    // 1. Call the refresh endpoint (this endpoint is public/unprotected)
                     const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {
                         refreshToken: authData.refreshToken,
                     });
@@ -48,19 +49,20 @@ api.interceptors.response.use(
                         };
                         localStorage.setItem('authData', JSON.stringify(newAuthData));
                         
-                        // Update headers and retry the original request
+                        // 2. Update the default header for future calls
                         api.defaults.headers.common['Authorization'] = `Bearer ${res.data.accessToken}`;
+                        
+                        // 3. Retry the original failing request
                         return api(originalRequest);
                     }
                 } catch (refreshError) {
-                    console.error('Token refresh failed', refreshError);
-                    // Force logout on refresh failure
+                    // 4. If refresh fails, log out and redirect to login
                     localStorage.removeItem('authData');
                     window.location.href = '/login';
                     return Promise.reject(refreshError);
                 }
             } else {
-                // No refresh token, force logout
+                // 5. If no refresh token exists, force logout
                 localStorage.removeItem('authData');
                 window.location.href = '/login';
             }
