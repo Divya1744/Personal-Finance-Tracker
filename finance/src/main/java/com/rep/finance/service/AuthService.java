@@ -82,6 +82,8 @@ public class AuthService {
                 .id(UUID.randomUUID().toString())
                 .isVerified(false)
                 .role(Role.USER)
+                // ADDED: Map phone number to entity
+                .phoneNumber(request.getPhoneNumber())
                 .build();
     }
 

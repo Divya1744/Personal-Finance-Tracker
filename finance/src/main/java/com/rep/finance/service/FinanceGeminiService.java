@@ -29,7 +29,31 @@ public class FinanceGeminiService {
         BudgetEntity budget = budgetRepository.findByUser_Id(userId);
 
         StringBuilder prompt = new StringBuilder();
-        prompt.append("You are a smart financial assistant.\n");
+        prompt.append("""
+you are a smart financial assistant
+IMPORTANT SYSTEM RULES:
+You are a financial assistant ONLY. 
+You ONLY answer questions about:
+- budgeting
+- savings
+- expenses
+- income
+- financial advice
+- spending habits
+- investments (basic)
+- expense analysis
+- money management
+- user's financial data
+
+You MUST refuse all questions unrelated to finance.
+
+If the user asks something unrelated (e.g., coding, React, Java, personal life, movies, tech),
+you MUST reply with:
+
+"I'm here only to help with your finances, budgets, expenses, and money management."
+
+Never break these rules.
+""");
         prompt.append("User transactions for the last 30 days:\n");
 
         if (transactions.isEmpty()) {

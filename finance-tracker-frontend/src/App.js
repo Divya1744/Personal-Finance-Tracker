@@ -10,6 +10,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import DashboardPage from './pages/DashboardPage';
 import AiAdvicePage from './pages/AiAdvicePage';
 import OcrScanPage from './pages/OcrScanPage';
+import ScheduledTransactionPage from './pages/ScheduledTransactionPage'; // <-- NEW IMPORT
 
 const App = () => {
     return (
@@ -27,6 +28,7 @@ const App = () => {
                     {/* Protected Routes (All features requiring auth) */}
                     <Route element={<ProtectedRoute />}>
                         <Route path="/dashboard" element={<DashboardPage />} />
+                        <Route path="/scheduled" element={<ScheduledTransactionPage />} /> {/* <-- NEW PROTECTED ROUTE */}
                         <Route path="/ai" element={<AiAdvicePage />} />
                         <Route path="/ocr" element={<OcrScanPage />} />
                     </Route>

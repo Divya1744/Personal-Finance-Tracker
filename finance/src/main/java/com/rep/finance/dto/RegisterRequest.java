@@ -19,4 +19,5 @@ public class RegisterRequest {
     @Email(message = "Enter valid Email address")
     @NotNull(message = "Email should not be empty")
     private String email;
+    private String phoneNumber;
 }

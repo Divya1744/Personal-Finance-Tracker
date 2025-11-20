@@ -1,13 +1,13 @@
-import jsPDF from 'jspdf';
-import 'jspdf-autotable'; // <-- CRUCIAL: This line must be present for the plugin to attach
+// Note: All PDF libraries (jspdf, jspdf-autotable) have been removed from this file.
 
-// Utility function to export data to CSV
+// Utility function to export data to CSV (Excel compatible)
 export const exportToCSV = (data, filename = 'financial_report.csv') => {
     if (!data || data.length === 0) {
         alert("No transactions to export.");
         return;
     }
 
+    // Define the column headers and the fields to extract
     const headers = ["ID", "Timestamp", "Type", "Category", "Amount", "Note", "User ID"];
     const fields = ["id", "timestamp", "type", "category", "amount", "note", "user.id"];
 
@@ -18,6 +18,7 @@ export const exportToCSV = (data, filename = 'financial_report.csv') => {
         const values = fields.map(field => {
             let value = '';
             
+            // Handle nested field (user.id)
             if (field.includes('.')) {
                 const [parent, child] = field.split('.');
                 value = item[parent] ? item[parent][child] : '';
@@ -25,6 +26,7 @@ export const exportToCSV = (data, filename = 'financial_report.csv') => {
                 value = item[field];
             }
             
+            // Escape double quotes and surround with quotes if value contains comma or quotes
             if (typeof value === 'string') {
                 value = value.replace(/"/g, '""');
                 if (value.includes(',')) {
@@ -50,59 +52,4 @@ export const exportToCSV = (data, filename = 'financial_report.csv') => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
-};
-
-
-// Utility function to export data to PDF
-export const exportToPDF = (data, filename = 'financial_report.pdf') => {
-    if (!data || data.length === 0) {
-        alert("No transactions to export.");
-        return;
-    }
-
-    // Initialize jsPDF
-    const doc = new jsPDF();
-    const headers = [
-        "ID", 
-        "Date", 
-        "Type", 
-        "Category", 
-        "Amount (₹)", 
-        "Note"
-    ];
-
-    // Prepare table data (rows)
-    const body = data.map(item => [
-        item.id,
-        new Date(item.timestamp).toLocaleDateString(),
-        item.type,
-        item.category,
-        `₹${item.amount.toFixed(2)}`,
-        item.note || 'N/A'
-    ]);
-
-    // Add title
-    doc.setFontSize(18);
-    doc.text("Personal Finance Report", 14, 20);
-    
-    // Add date range
-    doc.setFontSize(10);
-    const dateRange = data.length > 0 
-        ? `From ${new Date(data[0].timestamp).toLocaleDateString()} to ${new Date(data[data.length - 1].timestamp).toLocaleDateString()}` 
-        : '';
-    doc.text(dateRange, 14, 25);
-
-    // Call autoTable (now successfully attached)
-    doc.autoTable({
-        startY: 30, 
-        head: [headers],
-        body: body,
-        theme: 'striped',
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [79, 70, 229] }, 
-        margin: { top: 10 }
-    });
-
-    // Save the PDF
-    doc.save(filename);
 };

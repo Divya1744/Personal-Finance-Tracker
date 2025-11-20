@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Home, Zap, Camera, LogIn, UserPlus, LogOut } from 'lucide-react';
+import { Home, Zap, Camera, CalendarClock, LogIn, UserPlus, LogOut } from 'lucide-react'; // <-- ADD CalendarClock
 
 const Header = () => {
     const { logout, isAuthenticated } = useAuth();
@@ -17,6 +17,7 @@ const Header = () => {
                     // Authenticated Navigation
                     <nav className="flex items-center space-x-4">
                         <NavLink to="/dashboard" icon={Home} label="Dashboard" />
+                        <NavLink to="/scheduled" icon={CalendarClock} label="Scheduled" /> {/* <-- NEW LINK */}
                         <NavLink to="/ai" icon={Zap} label="AI Advice" />
                         <NavLink to="/ocr" icon={Camera} label="OCR Scan" />
                         
@@ -30,7 +31,7 @@ const Header = () => {
                         </button>
                     </nav>
                 ) : (
-                    // Unauthenticated Navigation (Links for Landing Page)
+                    // Unauthenticated Navigation
                     <nav className="flex items-center space-x-4">
                         <NavLink to="/login" icon={LogIn} label="Login" />
                         <Link

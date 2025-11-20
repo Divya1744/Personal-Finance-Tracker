@@ -44,4 +44,7 @@ public class UserEntity {
     @UpdateTimestamp
     private Timestamp updatedAt;
     private String refreshToken;
+
+    // ADDED: Phone number for SMS notifications
+    private String phoneNumber;
 }
