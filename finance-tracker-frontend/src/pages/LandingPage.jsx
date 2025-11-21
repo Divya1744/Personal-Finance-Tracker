@@ -45,7 +45,7 @@ const LandingPage = () => {
                                     {/* Placeholder Image for visual appeal */}
                                     <img 
                                         className="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto transform lg:translate-x-12 xl:translate-x-20 rounded-xl shadow-2xl" 
-                                        src="https://images.unsplash.com/photo-1551288258-28cec28d3e91?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+                                        src="https://plus.unsplash.com/premium_vector-1732280542722-dc060aa720ec?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                                         alt="Financial Dashboard Illustration" 
                                     />
                                 </div>
