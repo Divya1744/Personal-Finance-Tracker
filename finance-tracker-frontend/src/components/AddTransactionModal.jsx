@@ -135,9 +135,16 @@ const AddTransactionModal = ({ isOpen, onClose, onSave, transactionToEdit }) => 
                             className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:border-primary focus:ring-primary"
                             required
                         >
-                            {CATEGORIES.map(cat => (
+                            {
+                            formData.type === 'EXPENSE'?
+                            
+                            CATEGORIES.map(cat => (
                                 <option key={cat} value={cat}>{cat.charAt(0) + cat.slice(1).toLowerCase()}</option>
-                            ))}
+                            
+                            )):
+                            <option>Salary</option>
+                            
+                        }
                         </select>
                     </div>
 
